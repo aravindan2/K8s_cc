@@ -1,0 +1,19 @@
+
+serverFiles:
+  alerting_rules.yml:
+    groups:
+      - name: flask-health
+        rules:
+          - alert: FlaskPodNotReady
+            expr: |
+              kube_pod_status_ready{
+                namespace="default",
+                pod=~"flask-app-.*",
+                condition="true"
+              } == 0
+            for: 30s
+            labels:
+              severity: warning
+            annotations:
+              summary: "Flask pod is not ready"
+              description: "Flask pod {{ $labels.pod }} has been unready for at least 30 seconds."

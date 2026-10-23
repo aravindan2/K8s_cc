@@ -31,7 +31,7 @@ todos = db.todo
 
 app = Flask(__name__)
 title = "TODO with Flask"
-heading = "ToDo Reminder"
+heading = "ToDo Reminder - Version 2"
 #modify=ObjectId()
 
 def redirect_url():

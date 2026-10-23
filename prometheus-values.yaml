@@ -1,0 +1,66 @@
+
+server:
+  enabled: true
+  replicaCount: 1
+
+  persistentVolume:
+    enabled: false
+
+  resources:
+    requests:
+      cpu: 200m
+      memory: 512Mi
+    limits:
+      memory: 1Gi
+
+  global:
+    scrape_interval: 30s
+    evaluation_interval: 15s
+
+alertmanager:
+  enabled: true
+
+  persistence:
+    enabled: false
+
+  replicaCount: 1
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      memory: 256Mi
+
+  extraSecretMounts:
+    - name: slack-webhook
+      secretName: slack-webhook
+      mountPath: /etc/alertmanager/slack
+      readOnly: true
+
+  config:
+    global:
+      resolve_timeout: 5m
+
+    route:
+      receiver: slack
+      group_wait: 10s
+      group_interval: 30s
+      repeat_interval: 1h
+
+    receivers:
+      - name: slack
+        slack_configs:
+          - api_url_file: /etc/alertmanager/slack/webhook
+            send_resolved: true
+            title: 'Kubernetes Alert: {{ .Status }}'
+            text: '{{ range .Alerts }}{{ .Annotations.description }}{{ end }}'
+
+"prometheus-node-exporter":
+  enabled: false
+
+"prometheus-pushgateway":
+  enabled: false
+
+"kube-state-metrics":
+  enabled: true
